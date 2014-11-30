@@ -7,8 +7,9 @@
 % so only the main file is tracked.
 % Do not edit by hand!
 \RCS$Revision: 207461 $
-\RCS$HeadURL: svn+ssh://dimatteo@svn.cern.ch/reps/tdr2/notes/IN-14-XXX/trunk/IN-14-XXX.tex$
+\RCS$HeadURL: svn+ssh://snarayan@svn.cern.ch/reps/tdr2/notes/IN-14-XXX/trunk/IN-14-XXX.tex$
 \RCS$Id: IN-14-XXX.tex 207461 2013-09-18 14:56:50Z tapper $
+\newcommand{\Na}{N_\text{accesses}}
 %%%%%%%%%%%%% ptdr definitions %%%%%%%%%%%%%%%%%%%%%
 %\input{ptdr-definitions} %These have been replaced by the equivalent style file
 %%%%%%%%%%%%%%%  Title page %%%%%%%%%%%%%%%%%%%%%%%%
@@ -24,16 +25,15 @@
 %%%%%%%%%%%%%%%  Title page %%%%%%%%%%%%%%%%%%%%%%%%
 \cmsNoteHeader{IN 2014/XXX} % This is over-written in the CMS environment: useful as preprint no. for export versions
 % >> Title: please make sure that the non-TeX equivalent is in PDFTitle below
-\title{Dynamic Data Management for Tier-3 Sites}
+\title{Popularity Metrics of Dynamically-Managed Datasets}
 
 % >> Authors
 %Author is always "The CMS Collaboration" for PAS and papers, so author, etc, below will be ignored in those cases
 %For multiple affiliations, create an address entry for the combination
 \address[MIT]{Massachusetts Institute of Technology}
 
-\author[MIT]{L. Di Matteo}
+\author[MIT]{S. Narayanan}
 \author[MIT]{M. Goncharov}
-\author[MIT]{J. Lawhorn}
 \author[MIT]{C. Paus}
 
 % >> Date
@@ -49,22 +49,17 @@
 % 2. **DO NOT use %**                  to comment out sections of the abstract: the extractor will still grab those lines (and they won't be comments any longer!).
 % 3. **DO NOT use tex macros**         in the abstract: External TeX parsers used on the abstract don't understand them.
 \abstract{
-CMS data is ordered in datasets, which have some common properties and are usually
-analyzed together. As data taking progresses and Monte Carlo tools improve, datasets are often
-replaced and site administrators have to identify and delete out-dated datasets. In this note we 
-document a novel approach to dataset managing aimed at the full automatization of the dataset ranking, 
-deletion and download procedures. We focus on an implementation of this system at the computing 
-facility T3\_US\_MIT.
+CMS data is ordered in datasets, which have some common properties and are usually analyzed together. As data taking progresses and Monte Carlo tools improve, datasets are often replaced and site administrators have to identify and delete out-dated datasets. Dynamic Data Management is a novel method to automatically manage the distribution and deletion of datasets. In this note, we describe a metric of DDM performance, based on the number of user requests per dataset replica.
 }
 
 % >> PDF Metadata
 % Do not comment out the following hypersetup lines (metadata). They will disappear in NODRAFT mode and are needed by CDS.
 % Also: make sure that the values of the metadata items are sensible. For APS submissions, they are automatically converted to APS keywords.
 \hypersetup{%
-pdfauthor={L. Di Matteo, M. Goncharov, J. Klawhorn, C. Paus},%
-pdftitle={Dynamic Data Management for Tier-3 Sites},%
+pdfauthor={S. Narayanan, M. Goncharov, C. Paus},%
+pdftitle={Popularity Metrics of Dynamically-Managed Datasets},%
 pdfsubject={CMS},%
-pdfkeywords={CMS, trigger, jets, pile up}}
+pdfkeywords={CMS, Dynamic Data Management, popularity}}
 
 \maketitle %maketitle comes after all the front information has been supplied
 
@@ -80,14 +75,14 @@ pdfkeywords={CMS, trigger, jets, pile up}}
 \section{Introduction}\label{sec:introduction}
 \input{introduction.tex}
 
-\section{The MIT HEP Computing System}\label{sec:mithepcomp}
-\input{mithepcomp.tex}
+% \section{The MIT HEP Computing System}\label{sec:mithepcomp}
+% \input{mithepcomp.tex}
 
-\section{The MIT HEP Dynamic Data}\label{sec:mithepdd}
-\input{mithepdd.tex}
+% \section{The MIT HEP Dynamic Data}\label{sec:mithepdd}
+% \input{mithepdd.tex}
 
-\section{Summary}
-\input{summary.tex}
+% \section{Summary}
+% \input{summary.tex}
 
 % >> acknowledgements (for journal papers)
 % Please include the latest version from https://twiki.cern.ch/twiki/bin/viewauth/CMS/Internal/PubAcknow.
