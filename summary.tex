@@ -1,13 +1,8 @@
-The amount of resources needed for the CMS computing system will grow significantly as we are approaching the 
-beginning of LHC Run-II, and the CMS computing management is now proposing to make best use of our infrastructure by employing a 
-novel way of managing the data distribution.
-
-In this document, we have summarized the fundamental ingredients of the new Dynamic Data Management system, in particular
-we have focused on the MIT HEP computing resources, where a simplified prototype of such a system has been already set in place.
-
-We have introduced the MIT HEP Dynamic Data, and summarized its core structure, functionalities and scope.
-Examples of the good performances of our system have been reported, as well as live pages where any user can access and 
-evaluate our product. 
-
-Our experience with this new way of data managing is overall extremely positive and we think that other sites might as well 
-benefit from it, and eventually that this will lead to an improved usage of the CMS computing resources.
+Having computed these variables for each dataset, the popularity plot may be made. The histogram is filled for each dataset by choosing the following bin-value:
+\begin{equation}\dfrac{N_\text{accesses}}{N_\text{files}\cdot \Nr}\end{equation}
+The factor of $\Nf$ in the denominator is due to the fact that a single request to a dataset actually consists of a series of requests to each file in the dataset. Dividing by $N_\text{files}$ ensures that this quantity is the same for small and large datasets. The entry is given weight:
+\begin{equation}
+\Nr\cdot \text{size}
+\end{equation}
+For ease of comparing plots made under different conditions, the bin-value is normalized to the length of the time interval (in Figure 1, the unit of time is months). Currently, all datasets currently in AnalysisOps (except for \verb|USER|) are considered. All Tier 2 sites are considered, but no Tier 1 sites. Finally, the plot is normalized to have an integral of unity. The un-normalized integral can be thought of as a measure of ``average data volume'' during the interval, since it can be computed as:
+\[\sum_\text{datasets} \Nr \cdot \text{size}\]

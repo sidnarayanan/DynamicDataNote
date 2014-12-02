@@ -10,7 +10,8 @@
 \RCS$HeadURL: svn+ssh://snarayan@svn.cern.ch/reps/tdr2/notes/IN-14-XXX/trunk/IN-14-XXX.tex$
 \RCS$Id: IN-14-XXX.tex 207461 2013-09-18 14:56:50Z tapper $
 \newcommand{\Na}{N_\text{accesses}}
-\newcommand{\Nr}{N_\text{replicas}}
+\newcommand{\Nf}{N_\text{files}}
+\newcommand{\Nr}{\langle N_\text{replicas}\rangle}
 %%%%%%%%%%%%% ptdr definitions %%%%%%%%%%%%%%%%%%%%%
 %\input{ptdr-definitions} %These have been replaced by the equivalent style file
 %%%%%%%%%%%%%%%  Title page %%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,17 +77,19 @@ pdfkeywords={CMS, Dynamic Data Management, popularity}}
 \section{Introduction}\label{sec:introduction}
 \input{introduction.tex}
 
-\section{Computing $N_\text{replicas}$}\label{sec:replicas}
+\section{Computing average $N_\text{replicas}$}\label{sec:replicas}
 \input{replicas.tex}
 
+\section{Computing $\Na$, $\text{size}$, and $N_\text{files}$}\label{sec:othervars}
+\input{othervars.tex}
 % \section{The MIT HEP Computing System}\label{sec:mithepcomp}
 % \input{mithepcomp.tex}
 
 % \section{The MIT HEP Dynamic Data}\label{sec:mithepdd}
 % \input{mithepdd.tex}
 
-% \section{Summary}
-% \input{summary.tex}
+\section{Filling the plot}
+\input{summary.tex}
 
 % >> acknowledgements (for journal papers)
 % Please include the latest version from https://twiki.cern.ch/twiki/bin/viewauth/CMS/Internal/PubAcknow.
