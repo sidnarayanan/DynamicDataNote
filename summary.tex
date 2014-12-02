@@ -1,8 +1,16 @@
+\subsection{Dataset selection}
+Currently, we consider all datasets that are currently on, or have been on, Tier 2 sites (Tier 1s are excluded). This information is gathered from two places. First, we ask Phedex for all datasets which are currently on Tier 2s. Then, we use the \verb|deleterequests| Phedex API to determine all datasets which have been deleted during the relevant time interval. We consider all datasets in the union of these two sets. Finally, we double-check using the Phedex transfer/deletion histories that it actually was on at least one site during the interval. If the dataset passes this check, a corresponding entry is made in the histogram, as discussed below.
+
+\subsection{Binning}
+
 Having computed these variables for each dataset, the popularity plot may be made. The histogram is filled for each dataset by choosing the following bin-value:
 \begin{equation}\dfrac{N_\text{accesses}}{N_\text{files}\cdot \Nr}\end{equation}
 The factor of $\Nf$ in the denominator is due to the fact that a single request to a dataset actually consists of a series of requests to each file in the dataset. Dividing by $N_\text{files}$ ensures that this quantity is the same for small and large datasets. The entry is given weight:
 \begin{equation}
 \Nr\cdot \text{size}
 \end{equation}
-For ease of comparing plots made under different conditions, the bin-value is normalized to the length of the time interval (in Figure 1, the unit of time is months). Currently, all datasets currently in AnalysisOps (except for \verb|USER|) are considered. All Tier 2 sites are considered, but no Tier 1 sites. Finally, the plot is normalized to have an integral of unity. The un-normalized integral can be thought of as a measure of ``average data volume'' during the interval, since it can be computed as:
-\[\sum_\text{datasets} \Nr \cdot \text{size}\]
+For ease of comparing plots made under different conditions, the bin-value is normalized to the length of the time interval (in Figure 1, the unit of time is months). Finally, the plot is normalized to have an integral of unity. The un-normalized integral can be thought of as a measure of ``average data volume'' during the interval, since it can be computed as:
+\begin{equation}
+\sum_\text{datasets} \Nr \cdot \text{size}
+\end{equation}
+Finally, it should be noted that there are two special bins in Figure~\ref{fig:usage}. The very last bin is the overflow bin. The very first bin contains those entries for which $\Na=0$ exactly. It is important to recall that the histogram is only filled with datasets that were on at least one site during the relevant interval. Thus, the very first bin shows the fractional volume of datasets which were on disk, but not accessed, during an interval.

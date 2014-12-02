@@ -1,9 +1,9 @@
-Dynamic Data Management currently manages a pool of approximately 20 PB across several Tier 2 and Tier 1 sites. Datasets which are considered deprecated are deleted, while those which are very popular are replicated at multiple sites. A good measure of the performance of this algorithm is the number of accesses per replica. If this number is very small, then the dataset is not being replicated according to its popularity. On the other hand, if it is very small for many datasets, then we are maintaining too many copies of unused datasets. To make popularity plots as shown in Figure~\ref{fig:usage}, four attributes are computed for each dataset: number of accesses, size on disk, number of files, and average number of replicas.
+Dynamic Data Management currently manages a pool of approximately 20 PB across several Tier 2 and Tier 1 sites. If a dataset is very popular, it will be replicated at several sites. On the other hand, we delete replicas of unpopular datasets, as long as it is not the last copy. If a dataset is declared deprecated, all copies will be deleted.  A good measure of the performance of this algorithm is the number of accesses per replica. If, for a given dataset, this number is very large, then the dataset is not sufficiently replicated. On the other hand, if it is very small for many datasets, then we are maintaining too many copies of unused datasets. To make popularity plots as shown in Figure~\ref{fig:usage}, four attributes are computed for each dataset: number of accesses, size on disk, number of files, and average number of replicas.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.45\textwidth]{plots/DatasetSummaryAll_nSitesAverage.png}
-    \caption{Dataset usage plot for the time interval $[09/2013,\text{present}]$}
+    \includegraphics[width=0.45\textwidth]{plots/analysisOps_usage.png}
+    \caption{Dataset usage plot for the time interval $[09/2013,\text{present}]$. Only datasets in AnalysisOps are included.}
     \label{fig:usage}
 \end{figure}
 
