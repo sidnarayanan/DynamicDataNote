@@ -1,0 +1,8 @@
+
+Phedex directly provides us with the current locations of all datasets. However, this information is not directly available for the past. Thus, Phedex transfer and deletion histories are used to infer the presence of a dataset on a site. The histories are `sanitized' to remove self-inconsistent entries such as the transfer of a dataset to a site on which it already exists (it is assumed that each site can only contain one copy of a dataset). If there is no Phedex history for a given dataset on a given site, but we know that the dataset is currently on that site, then it is assumed to have existed since its creation time (which is determined using DAS). 
+
+Having collected this information, $\Nr$ can be computed for a given time interval $[t_0,t_1]$. Then, summing over the sites:
+\begin{equation}
+\Nr = \sum_{S\in \text{sites}} \dfrac{\text{time on }S\text{ during }[t_0,t_1]}{t_1-t_0}
+\end{equation}
+This gives the average number of replicas of a dataset in a specific time interval. 
