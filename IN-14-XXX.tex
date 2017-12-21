@@ -150,7 +150,7 @@ which in turn gets the information from DBS ($N_\mathrm{files}$ and size) or pop
 %+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 \section{Definition of metric}
 
-The ``metric'', as opposed to being a number, is a plot. There are two definitions
+The ``metric'', as opposed to being a number, is a histogram. There are two definitions
 proposed, each showing a slightly different picture. It should be emphasized that
 neither definition is incorrect; the reader can pick which to use based on what
 they would like to show.
@@ -172,55 +172,50 @@ The weight of each replica is:
 That is, if a dataset with one file exists on site A for half of the time interval 
 and is accessed once, and then moved to site B for the remainder of the time but 
 never accessed, two entries would be made with equal weight (size/2): one at $0$ 
-and another at $0.5$.
+and another at $0.5$. The case of $\Na^S=0$ is treated specially: if the dataset
+was created before the time interval in question, the replica is put in a separate
+``0 old'' bin.
+An example of such a plot is shown in Figure~\ref{fig:replicas}.
+
+\begin{figure}[htpb]
+  \begin{center}
+    \includegraphics[width=0.85\textwidth]{plots/per_replica.png}
+  \end{center}
+  \caption{Popularity histogram filled with each replica treated separately.}  
+  \label{fig:replicas}
+\end{figure}
 
 
 %===============================================================================
-\subsection{Binning}
+\subsection{Per-dataset}
 
-Having computed these variables for each dataset, the popularity plot may be
-made. The histogram is filled for each dataset by choosing the following
-bin-value:
+For each dataset, the $x$-value of the histogram is fixed at:
 %
 \begin{equation}
-  \dfrac{N_\text{accesses}}{N_\text{files}\cdot \Nr}
+  \frac{\sum_S\Na^S}{N_\mathrm{files}}
 \end{equation}
 %
-The factor of $\Nf$ in the denominator is due to the fact that a single request
-to a dataset actually consists of a series of requests to each file in the
-dataset. Dividing by $N_\text{files}$ ensures that this quantity is the same for
-small and large datasets. The entry is given weight:
-%
+The weight of each dataset is:
 \begin{equation}
-  \Nr\cdot \text{size}
+  \mathrm{size} \times \Nr
 \end{equation}
-%
-For ease of comparing plots made under different conditions, the bin-value is
-normalized to the length of the time interval (in Figure~\ref{fig:usage}, the unit of time is
-months). Finally, the plot is normalized to have an integral of unity. The
-un-normalized integral can be thought of as a measure of ``average data volume''
-during the interval, since it can be computed as:
-%
-\begin{equation}
-  \sum_\text{datasets} \Nr \cdot \text{size}
-\end{equation}
-%
-Finally, it should be noted that there are two special bins in
-Figure~\ref{fig:usage}. The very last bin is the overflow bin. The very first
-bin contains those entries for which $\Na=0$ exactly. It is important to recall
-that the histogram is only filled with datasets that were on at least one site
-during the relevant interval. Thus, the very first bin shows the fractional
-volume of datasets which were on disk, but not accessed, during an interval.
+That is, if a dataset with one file exists on site A for half of the time interval 
+and is accessed once, and then moved to site B for the remainder of the time but 
+never accessed, a single entry would be made with weight $2\times\mathrm{size}/2$ 
+at $0.5$. Again, the case of $\Na^S=0$ is treated specially: if the dataset
+was created before the time interval in question, it is put in a separate
+``0 old'' bin.
+An example of such a plot is shown in Figure~\ref{fig:datasets}.
 
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.45\textwidth]{plots/analysisOps_usage.png}~ 
-  \includegraphics[width=0.45\textwidth]{plots/DatasetSummary01-2014_nSitesAverage.png}\\
-  \includegraphics[width=0.45\textwidth]{plots/DatasetSummary06-2014_nSitesAverage.png}~
-  \includegraphics[width=0.45\textwidth]{plots/DatasetSummary09-2014_nSitesAverage.png}
-  \caption{Usage plots datasets in AnalysisOps for various time intervals.}
-  \label{fig:usage}
+\begin{figure}[htpb]
+  \begin{center}
+    \includegraphics[width=0.85\textwidth]{plots/per_dataset.png}
+  \end{center}
+  \caption{Popularity histogram filled with each dataset as a single unit.}  
+  \label{fig:datasets}
 \end{figure}
+
+
 
 \clearpage
 
