@@ -3,7 +3,8 @@
 \RCS$Id: IN-14-XXX.tex 207461 2013-09-18 14:56:50Z tapper $
 \newcommand{\Na}{N_\text{accesses}}
 \newcommand{\Nf}{N_\text{files}}
-\newcommand{\Nr}{\langle N_\text{replicas}\rangle}
+\newcommand{\Nr}{\langle N_\text{rep}\rangle}
+\newcommand{\fr}{f_\text{rep}^S}
 \newlength\cmsFigWidth
 \ifthenelse{\boolean{cms@external}}{\setlength\cmsFigWidth{0.85\columnwidth}}{\setlength\cmsFigWidth{0.4\textwidth}}
 \ifthenelse{\boolean{cms@external}}{\providecommand{\cmsLeft}{top}}{\providecommand{\cmsLeft}{left}}
@@ -13,12 +14,13 @@
 
 \title{Disk Storage Usage and Metrics for Dynamic Data Management}
 \address[MIT]{Massachusetts Institute of Technology}
-\author[MIT]{S. Narayanan}
+\author[MIT]{Y. Iiyama}
 \author[MIT]{M. Goncharov}
+\author[MIT]{S. Narayanan}
 \author[MIT]{C. Paus}
 
 \hypersetup{%
-pdfauthor={S. Narayanan, M. Goncharov, C. Paus},%
+pdfauthor={M. Goncharov, Y. Iiyama, S. Narayanan, C. Paus},%
 pdftitle={Disk Storage Usage and Metrics for Dynamic Data Management},%
 pdfsubject={CMS},%
 pdfkeywords={CMS, Dynamic Data Management, popularity}%
@@ -41,7 +43,7 @@ pdfkeywords={CMS, Dynamic Data Management, popularity}%
   replication of datasets in the distributed multi-site computing system with
   the goal of optimising the system performance. In this note, we describe a
   metric for the performance of Dynamic Data Management, based on the number
-  of user accesses of a the given datasets.
+  of user accesses of the given datasets.
 %%
 }
 
@@ -52,11 +54,11 @@ pdfkeywords={CMS, Dynamic Data Management, popularity}%
 %+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 \section{Introduction}\label{sec:introduction}
 
-Dynamic Data Management currently manages a pool of approximately 20~PB across
+Dynamic Data Management currently manages a pool of approximately 80~PB across
 several Tier-2 and Tier-1 sites. The purpose of the management to first order is
 the creation and deletion of replicas of datasets that are part of the pool.
-Additional replicas of a dataset are created when the dataset is particular
-popular while excess replicas are deleted when they are less popular. The
+Additional replicas of a dataset are created when the dataset is particularly
+popular, while excess replicas are deleted when they are less popular. The
 creation and deletion of replicas does not add new datasets to the pool nor does
 it remove datasets entirely from it. Adding new datasets to the pool and
 completely removing datasets from it is treated separately. Newly created
@@ -89,61 +91,49 @@ listed properties for each dataset.
 \subsection{Dataset selection}
 
 The CMS experiment creates a large number of datasets of which not all are
-commonly used by the people doing analysis. From the detector we have RAW and
-RECO data formats, but since 2011 the much more compressed AOD datasets had been
-established as the datasets used for analysis. The other data formats are mostly
+commonly used by the people doing analysis. These data tiers are mostly
 stored on tape and are used for production purposes when the data or Monte Carlo
 simulation samples get re-reconstructed with better calibrations/alignments
-and/or new reconstruction algorithms. The majority of data on the Tier-2 centers
-are therefore of AOD or AODSIM format or since recently the even more reduced
-MINIAOD and MINIAODSIM format, but there are some other formats. In this study
-we evaluate data popularity in a given time interval and distinguish between two
-scenarios for the selection of datasets to consider.
-%
+and/or new reconstruction algorithms. The majority of data on Tier 1 and Tier 2 
+disks belong to the AOD, AODSIM, MINIAOD, and MINIAODSIM data tiers. In this study,
+we restrict ourselves to datasets that have been assigned to the AnalysisOps 
+PhEDEx group, for two reasons:
 \begin{itemize}
-\item include all datasets that are managed by phedex~\ref{PHEDEX} in any of the
-   official data groups and that were at some point during the considered
-   interval at a Tier-2 site, or
-\item include all datasets that are or were in the past managed by
-   phedex~\ref{PHEDEX} in the 'AnalysisOps' data group (this is the dynamic
-   data management pool) and that were at some point during the considered
-   interval at a Tier-2 site.
+  \item These subscriptions are created expressly for the purpose of user analysis,
+    and therefore are the target of popularity-based replication and deletion.
+  \item Production subscriptions (i.e. DataOps) are much shorter-lived, and furthermore,
+    current estimates of popularity do not properly account for WMAgent accesses.
+    Therefore, DataOps data appears completely unused, and it would be unfair to
+    consider it as wasting disk space.
 \end{itemize}
 
-We distinguish these two scenarios because the first one very generally shows
-the usage of our entire storage, while the second scenario zooms in on the
-dynamically managed data pool, and thus offers itself as a tool to optimize the
-data distribution for the best system performance.
-
-While the dataset selection appears to be a straight forward the fact that we do
-not have a full record of the contents of the data storage of the order 50
-Tier-2 sites makes it complicated. Obtaining the list of relevant datasets is a
-non trivial issue. In the popularity database we can easily find all datasets
-that were used at a particular site in the given time interval, but datasets
-that were not accessed during this time interval are not recorded and therefore
-we must use an alternative source to find all datasets.
-
 %===============================================================================
-\subsection{Average $N_\text{replicas}$}
+\subsection{Prorated disk usage}
 
-Phedex directly provides us with the current locations of all datasets. However,
-this information is not directly available for the past. Thus, Phedex transfer
+PhEDEx directly provides us with the current locations of all datasets. However,
+this information is not directly available for the past. Thus, PhEDEx transfer
 and deletion histories are used to infer the timeline of the presence of a
 dataset on a given site.
 
 The histories are `sanitized' to remove self-inconsistent entries such as the
 transfer of a dataset to a site on which it already exists. It is assumed that
-each site can only contain one copy of a dataset. If there is no Phedex history
+each site can only contain one copy of a dataset. If there is no PhEDEx history
 for a given dataset on a given site, but we know that the dataset is currently
 on that site, then it is assumed to have existed on the site since its creation
-time which is determined using DAS.
+time, which is determined using DBS.
 
-Having collected this information, $\Nr$ can be computed for a given time
-interval $[t_0,t_1]$. Then, summing over the sites:
+First, we define the ``replica fraction'' as the fraction of the relevant time
+interval that a particular replica existed at a site $S$:
 %
 \begin{equation}
-  \Nr = \sum_{S\in \text{sites}} \dfrac{\text{time on }S
-        \text{ during }[t_0,t_1]}{t_1-t_0}
+  f_\textrm{rep}^{S} = \frac{\textrm{time on $S$ during $[t_0,t_1]$}}{t_1 - t_0}
+\end{equation}
+
+For a given dataset, we define the average number of replicas $\Nr$ by summing over 
+the sites:
+%
+\begin{equation}
+  \Nr = \sum_{S\in \text{sites}} f_\textrm{rep}^{S}
 \end{equation}
 %
 This gives the average number of replicas of a dataset in a specific time
@@ -152,35 +142,38 @@ interval the count is prorated with the fraction of time it was present in the
 interval.
 
 %===============================================================================
-\subsection{Number of Accesses $\Na$ and File $N_\text{files}$,
-            and Size $\text{size}$}
+\subsection{Other dataset properties}
 
-The remaining variables are relatively easily calculated. The number of files
-and size of a dataset are retrieved from DAS. It should be noted that we assume
-each replica is a ``full'' replica. An incomplete replica may be missing files
-and consequently it will have a smaller size. We compute $\Na$ using the caches
-maintained by Detox. Detox is the Dynamic Data Management tool which deals with
-the deletion of deprecated datasets and under-utilized replicas. In order to
-make the latter decision, Detox keeps a local record of the number of accesses
-made to each replica of each dataset, derived from the popularity API. $\Na$ for
-a dataset is defined as the total number of accesses over all replicas of that
-dataset.
-
+The remaining variables are relatively easily extracted from the Dynamo database,
+which in turn gets the information from DBS ($N_\mathrm{files}$ and size) or popDB
+($\Na$).
 %+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-\section{Filling the plot}
+\section{Definition of metric}
+
+The ``metric'', as opposed to being a number, is a plot. There are two definitions
+proposed, each showing a slightly different picture. It should be emphasized that
+neither definition is incorrect; the reader can pick which to use based on what
+they would like to show.
 
 %===============================================================================
-\subsection{Dataset selection}
+\subsection{Per-replica}
 
-We consider all datasets that are currently on, or have been on, Tier 2 sites
-(Tier-1s are excluded). This information is gathered from two places. First, we
-ask Phedex for all datasets which are currently on Tier-2s. Then, we use the
-\verb|deleterequests| Phedex API to determine all datasets which have been
-deleted during the relevant time interval. We consider all datasets in the union
-of these two sets. Finally, we double-check using the Phedex transfer/deletion
-histories that it actually was on at least one site during the interval. If the
-dataset passes this check, a corresponding entry is made in the histogram, as
-discussed below.
+For each replica of a dataset at a site $S$, the $x$-value of the histogram is 
+fixed at:
+%
+\begin{equation}
+  \frac{\Na^S}{N_\mathrm{files}}
+\end{equation}
+%
+The weight of each replica is:
+\begin{equation}
+  \mathrm{size} \times \fr
+\end{equation}
+That is, if a dataset with one file exists on site A for half of the time interval 
+and is accessed once, and then moved to site B for the remainder of the time but 
+never accessed, two entries would be made with equal weight (size/2): one at $0$ 
+and another at $0.5$.
+
 
 %===============================================================================
 \subsection{Binning}
@@ -230,29 +223,6 @@ volume of datasets which were on disk, but not accessed, during an interval.
 \end{figure}
 
 \clearpage
-%% % >> acknowledgements (for journal papers)
-%% % Please include the latest version from https://twiki.cern.ch/twiki/bin/viewauth/CMS/Internal/PubAcknow.
-%% \section*{Acknowledgements}
-%% We congratulate our colleagues in the CERN accelerator departments for the
-%% excellent performance of the LHC and thank the technical and administrative
-%% staffs at CERN and at other CMS institutes for their contributions to the
-%% success of the CMS effort. In addition, we gratefully acknowledge the computing
-%% centres and personnel of the Worldwide LHC Computing Grid for delivering so
-%% effectively the computing infrastructure essential to our analyses. Finally, we
-%% acknowledge the enduring support for the construction and operation of the LHC
-%% and the CMS detector provided by the following funding agencies: BMWFW and FWF
-%% (Austria); FNRS and FWO (Belgium); CNPq, CAPES, FAPERJ, and FAPESP (Brazil); MES
-%% (Bulgaria); CERN; CAS, MoST, and NSFC (China); COLCIENCIAS (Colombia); MSES and
-%% CSF (Croatia); RPF (Cyprus); MoER, ERC IUT and ERDF (Estonia); Academy of
-%% Finland, MEC, and HIP (Finland); CEA and CNRS/IN2P3 (France); BMBF, DFG, and HGF
-%% (Germany); GSRT (Greece); OTKA and NIH (Hungary); DAE and DST (India); IPM
-%% (Iran); SFI (Ireland); INFN (Italy); NRF and WCU (Republic of Korea); LAS
-%% (Lithuania); MOE and UM (Malaysia); CINVESTAV, CONACYT, SEP, and UASLP-FAI
-%% (Mexico); MBIE (New Zealand); PAEC (Pakistan); MSHE and NSC (Poland); FCT
-%% (Portugal); JINR (Dubna); MON, RosAtom, RAS and RFBR (Russia); MESTD (Serbia);
-%% SEIDI and CPAN (Spain); Swiss Funding Agencies (Switzerland); MST (Taipei);
-%% ThEPCenter, IPST, STAR and NSTDA (Thailand); TUBITAK and TAEK (Turkey); NASU and
-%% SFFR (Ukraine); STFC (United Kingdom); DOE and NSF (USA).
 
 %% **DO NOT REMOVE BIBLIOGRAPHY**
 \bibliography{auto_generated}   % will be created by the tdr script.
